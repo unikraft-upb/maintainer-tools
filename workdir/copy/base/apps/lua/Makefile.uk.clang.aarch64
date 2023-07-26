@@ -1,0 +1,5 @@
+$(eval $(call addlib,applua))
+
+CFLAGS-y += --target=aarch64-none-elf
+ASFLAGS-y += --target=aarch64-none-elf
+CXXFLAGS-y += --target=aarch64-none-elf

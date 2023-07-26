@@ -1,1 +1,1 @@
-pr_list="9 8"
+pr_list="10"
