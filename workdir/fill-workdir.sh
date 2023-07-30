@@ -15,7 +15,9 @@ pushd libs > /dev/null 2>&1
 ./clone-all.sh
 popd > /dev/null 2>&1
 
-cp -r copy/base/* .
+if stat -t copy/base/* > /dev/null 2>&1; then
+   cp -r copy/base/* .
+fi
 
 apps=(apps/*/)
 for a in ${apps[@]}; do
