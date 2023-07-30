@@ -22,9 +22,8 @@ fi
 apps=(apps/*/)
 for a in ${apps[@]}; do
     cp copy/common/checkout-prs.sh "$a"
-    cp copy/common/make-hierarchy.sh "$a"
     pushd "$a" > /dev/null 2>&1
-    ./make-hierarchy.sh
+    ../../copy/common-nocopy/make-hierarchy.sh
     ./checkout-prs.sh
     popd > /dev/null 2>&1
 done
