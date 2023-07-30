@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if ! test -f ./pr_list.inc; then
-    echo "No pr_list.inc file. Aborting." 1>&2
+    echo "No pr_list.inc file. Not checking out." 1>&2
     exit 1
 fi
 
