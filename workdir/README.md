@@ -76,6 +76,96 @@ This gives a nice way of adding custom items to repositories **after** they've b
 Files in `copy/common/` care duplicated in almost all repositories.
 In `copy/base/` you have a specific file per directory, and the copying is something like `cp -r copy/base/* .`.
 In `copy/common/` the files are common to all directories, and the copying is something like `for d in apps/*/; do cp copy/common/* "$d"; done`.
+Scripts in `copy/common-nocopy/` are to be used / called directly in this location, without being copied to specific directories.
+
+Scripts are then run.
+In the end, the entire environment is ready for building and running applications.
+
+## Building Applications
+
+### Make-based Application Builds
+
+Applications are built using the `build` scripts in the application directory.
+There are multiple scripts, each for a specific environment.
+Variations of the environment are:
+
+* Architecture: x86_64 or AArch64
+* Platform (hypervisor / VMM): QEMU-KVM, Firecracker-KVM, Xen etc.
+* Filesystem: 9pfs or initrd
+* Compiler toolchain: GCC or LLVM / Clang
+
+For example, for `app/lua/`, the build script are:
+
+```console
+[...]/workdir/apps/lua$ ls *build-*
+build-fc-aarch64-initrd.sh  build-qemu-aarch64-initrd.sh  clang-build-fc-aarch64-initrd.sh  clang-build-qemu-aarch64-initrd.sh
+build-fc-x86_64-initrd.sh   build-qemu-x86_64-9pfs.sh     clang-build-fc-x86_64-initrd.sh   clang-build-qemu-x86_64-9pfs.sh
+build-qemu-aarch64-9pfs.sh  build-qemu-x86_64-initrd.sh   clang-build-qemu-aarch64-9pfs.sh  clang-build-qemu-x86_64-initrd.sh
+```
+
+For example, to build the QEMU image for x86_64 using `initrd` as a filesystem, use:
+
+```console
+./build-qemu-x86_64-initrd.sh
+```
+
+### Kraftkit-based Application Builds
+
+Applications can be built using KraftKit.
+Before building an application with KraftKit, it's safest to clean up the build directory:
+
+```console
+rm -fr .unikraft/build/
+```
+
+Then, use the command below:
+
+```console
+kraft build -j $(nproc)
+```
+
+You will be prompted with a set of options to select the build target:
+
+```text
+[?] select target:
+  ▸ lua-fc-arm64-initrd (fc/arm64)
+    lua-fc-x86_64-initrd (fc/x86_64)
+    lua-qemu-arm64-9pfs (qemu/arm64)
+    lua-qemu-arm64-initrd (qemu/arm64)
+    lua-qemu-x86_64-9pfs (qemu/x86_64)
+    lua-qemu-x86_64-initrd (qemu/x86_64)
+```
+
+Select one of them and obtain the corresponding Unikraft image.
+
+**Note**: Currently, KraftKit doesn't support 9pfs.
+When using Kraftkit, aim for the `-initrd` targets.
+
+## Running Applications
+
+### Make-based Builds
+
+To run applications, use the corresponding run script in the application directory:
+
+```console
+[...]/workdir/apps/lua$ ls run-*
+run-fc-x86_64-initrd.sh  run-qemu-aarch64-9pfs.sh  run-qemu-aarch64-initrd.sh  run-qemu-x86_64-9pfs.sh  run-qemu-x86_64-initrd.sh
+```
+
+For example, to run the QEMU image for x86_64 using `initrd` as a filesystem, use:
+
+```console
+./run-qemu-x86_64-initrd.sh
+```
+
+### KraftKit-based Builds
+
+To run applications with KraftKit, use `kraft run`.
+For the sample `initrd` build (e.g. `lua-qemu-x86_64-initrd`) above, use:
+
+```console
+kraft run --initrd fs0.cpio "/helloworld.lua"
+```
 
 Copied scripts are then run.
 In the end, the entire environment is ready for building and running applications.
