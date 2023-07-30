@@ -23,11 +23,21 @@ apps=(apps/*/)
 for a in ${apps[@]}; do
     cp copy/common/checkout-prs.sh "$a"
     cp copy/common/make-hierarchy.sh "$a"
+    pushd "$a" > /dev/null 2>&1
+    ./make-hierarchy.sh
+    ./checkout-prs.sh
+    popd > /dev/null 2>&1
 done
 
 libs=(libs/*/)
 for l in ${libs[@]}; do
     cp copy/common/checkout-prs.sh "$l"
+    pushd "$l" > /dev/null 2>&1
+    ./checkout-prs.sh
+    popd > /dev/null 2>&1
 done
 
 cp copy/common/checkout-prs.sh unikraft/
+pushd unikraft/ > /dev/null 2>&1
+./checkout-prs.sh
+popd > /dev/null 2>&1
