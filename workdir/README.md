@@ -279,6 +279,7 @@ In case library or application repositories have been updated upstream and you r
 Customizing the setup refers to creating custom branches for different repositories.
 It's easiest to use the `checkout-prs.sh` script in this top-level folder.
 Running it without arguments will show a sample use case:
+<<<<<<< HEAD
 
 ```console
 $ ./checkout-prs.sh 
