@@ -1,0 +1,95 @@
+specification: '0.5'
+name: nginx
+unikraft:
+  source: .unikraft/unikraft/
+  kconfig:
+    - CONFIG_LIBUKLIBPARAM=y
+    - CONFIG_LIBUKSCHEDCOOP=y
+    - CONFIG_LIBPOSIX_LIBDL=y
+    - CONFIG_LIBPOSIX_PROCESS=y
+    - CONFIG_LIBPOSIX_USER=y
+    - CONFIG_UKSYSINFO=y
+    - CONFIG_LIBUKSIGNAL=y
+    - CONFIG_LIBUKMMAP=y
+    - CONFIG_LIBUKTIME=y
+targets:
+  - name: nginx-qemu-x86_64-9pfs
+    architecture: x86_64
+    platform: qemu
+    kconfig:
+      - CONFIG_PLAT_KVM=y
+      - CONFIG_LIBVFSCORE_AUTOMOUNT_ROOTFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS_9PFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS="9pfs"
+      - CONFIG_LIBVFSCORE_ROOTDEV="fs0"
+  - name: nginx-qemu-x86_64-initrd
+    architecture: x86_64
+    platform: qemu
+    kconfig:
+      - CONFIG_PLAT_KVM=y
+      - CONFIG_LIBVFSCORE_AUTOMOUNT_ROOTFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS_INITRD=y
+      - CONFIG_LIBVFSCORE_ROOTFS="initrd"
+  - name: nginx-qemu-aarch64-9pfs
+    architecture: arm64
+    platform: qemu
+    kconfig:
+      - CONFIG_PLAT_KVM=y
+      - CONFIG_ARCH_ARM_64=y
+      - CONFIG_MCPU_ARM64_NONE=y
+      - CONFIG_LIBVFSCORE_AUTOMOUNT_ROOTFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS_9PFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS="9pfs"
+      - CONFIG_LIBVFSCORE_ROOTDEV="fs0"
+  - name: nginx-qemu-aarch64-initrd
+    architecture: arm64
+    platform: qemu
+    kconfig:
+      - CONFIG_PLAT_KVM=y
+      - CONFIG_ARCH_ARM_64=y
+      - CONFIG_MCPU_ARM64_NONE=y
+      - CONFIG_LIBVFSCORE_AUTOMOUNT_ROOTFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS_INITRD=y
+      - CONFIG_LIBVFSCORE_ROOTFS="initrd"
+  - name: nginx-fc-x86_64-initrd
+    architecture: x86_64
+    platform: fc
+    kconfig:
+      - CONFIG_PLAT_KVM=y
+      - CONFIG_KVM_BOOT_PROTO_LXBOOT=y
+      - CONFIG_KVM_VMM_FIRECRACKER=y
+      - CONFIG_LIBVFSCORE_AUTOMOUNT_ROOTFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS_INITRD=y
+      - CONFIG_LIBVFSCORE_ROOTFS="initrd"
+  - name: nginx-fc-aarch64-initrd
+    architecture: arm64
+    platform: fc
+    kconfig:
+      - CONFIG_PLAT_KVM=y
+      - CONFIG_KVM_BOOT_PROTO_LXBOOT=y
+      - CONFIG_KVM_VMM_FIRECRACKER=y
+      - CONFIG_ARCH_ARM_64=y
+      - CONFIG_MCPU_ARM64_NONE=y
+      - CONFIG_LIBVFSCORE_AUTOMOUNT_ROOTFS=y
+      - CONFIG_LIBVFSCORE_ROOTFS_INITRD=y
+      - CONFIG_LIBVFSCORE_ROOTFS="initrd"
+libraries:
+  musl:
+    source: .unikraft/libs/musl/
+  lwip:
+    source: .unikraft/libs/lwip/
+    kconfig:
+      - CONFIG_LWIP_UKNETDEV=y
+      - CONFIG_LWIP_TCP=y
+      - CONFIG_LWIP_WND_SCALE=y
+      - CONFIG_LWIP_TCP_KEEPALIVE=y
+      - CONFIG_LWIP_THREADS=y
+      - CONFIG_LWIP_SOCKET=y
+      - CONFIG_LWIP_AUTOIFACE=y
+      - CONFIG_LWIP_IPV4=y
+      - CONFIG_LWIP_DHCP=y
+      - CONFIG_LWIP_DNS=y
+  nginx:
+    source: .unikraft/libs/nginx/
+    kconfig:
+      - CONFIG_LIBNGINX_MAIN_FUNCTION=y
