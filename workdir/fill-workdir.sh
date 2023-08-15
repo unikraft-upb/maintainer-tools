@@ -24,6 +24,7 @@ for a in ${apps[@]}; do
     cp copy/common/checkout-prs.sh "$a"
     pushd "$a" > /dev/null 2>&1
     ../../copy/common-nocopy/make-hierarchy.sh
+    ../../copy/common-nocopy/generate.sh
     ./checkout-prs.sh
     popd > /dev/null 2>&1
 done
