@@ -238,3 +238,30 @@ You can create / edit this file by hand in each repository, according to your ne
 **Note**: Because PR ids are transient (they will eventually get merged), we don't keep `pr_list.inc` files in the main branch (`staging`) of this repository.
 Rather, we will have temporary branches (such as `0.14-prs`) that we switch to that fill the `copy/base/` directory with the relevant `pr_list.inc` files.
 The temporary branch will have a short span, very likely between two releases, until the PRs get merged.
+
+## Testing Applications
+
+`test-apps.sh` is a script that goes through all applications, builds them with all available compiler and config options combinations, and then runs them for every build:
+Run it like so:
+
+```console
+./test-apps.sh
+```
+
+This results in output like:
+
+```console
+Testing builds for apps/helloworld/:
+building with ./clang-11-build-fc-x86_64-pie.sh         PASSED
+Running apps/helloworld/ on fc x86_64                   PASSED
+building with ./clang-11-build-fc-x86_64.sh             PASSED
+Running apps/helloworld/ on fc x86_64                   PASSED
+[...]
+```
+
+Logs of both builds and runs are saved in `logs/builds/app-name/` and `logs/runs/app-name`.
+
+Beware that it takes a lot of time for the script to run, since there are a lot of different build to be done for every application.
+
+In order for the script to be fully functional, config files need to be added for every application under `workdir/copy/base/apps/<app-name>/`.
+This is because, if no config file is present, the build scripts will open a menuconfig screen and then wait for user input.
