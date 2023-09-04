@@ -119,7 +119,15 @@ run_logs_dir="$(pwd)/logs/runs"
 mkdir -p "${build_logs_dir}" > /dev/null 2>&1
 mkdir -p "${run_logs_dir}" > /dev/null 2>&1
 
-apps=(apps/*/)
+apps=()
+if test "$#" -ge 1; then
+    for app in "$@"; do
+	    apps+=("apps/${app}")
+    done
+else
+    apps=(apps/*/)
+fi
+
 for a in "${apps[@]}"; do
     echo "Testing builds for ${a}:"
     mkdir "${build_logs_dir}/$(basename "${a}")" > /dev/null 2>&1
