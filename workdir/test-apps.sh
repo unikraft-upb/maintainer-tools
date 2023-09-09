@@ -67,7 +67,7 @@ test_httpreply()
     eval sudo "$1" > "$2" 2>&1 &
     sleep 3
 
-    curl --connect-timeout 10 -s 172.44.0.2:8123 | grep "It works!" > /dev/null 2>&1 && echo "PASSED" || echo "FAILED"
+    curl --connect-timeout 10 -s 172.44.0.2:8123 2> /dev/null | grep "It works!" > /dev/null 2>&1 && echo "PASSED" || echo "FAILED"
     kill_vm "$1" "$3"
 }
 
@@ -76,7 +76,7 @@ test_redis()
     eval sudo "$1" > "$2" 2>&1 &
     sleep 3
 
-    echo "PING" | timeout 10 redis-cli -h 172.44.0.2 -p 6379 | grep "PONG" > /dev/null 2>&1 && echo "PASSED" || echo "FAILED"
+    echo "PING" | timeout 10 redis-cli -h 172.44.0.2 -p 6379 2> /dev/null | grep "PONG" > /dev/null 2>&1 && echo "PASSED" || echo "FAILED"
     kill_vm "$1" "$3"
 }
 
