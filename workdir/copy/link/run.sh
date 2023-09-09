@@ -5,6 +5,7 @@ arch=""
 fs=""
 net=0
 kvm=0
+root=0
 extra_boot_args=""
 
 prepare_initrd()
@@ -47,16 +48,19 @@ run_qemu()
         prepare_qemu_net
         cmd="$cmd -netdev bridge,id=en0,br=virbr0 -device virtio-net-pci,netdev=en0 -append \"netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- $extra_boot_args\""
     elif test ! -z "$extra_boot_args"; then
-	cmd="$cmd -append \"-- $extra_boot_args\""
+        cmd="$cmd -append \"-- $extra_boot_args\""
     fi
     if test "$fs" = "initrd"; then
-	prepare_initrd
+        prepare_initrd
         cmd="$cmd -initrd fs0.cpio"
     fi
     if test "$fs" = "9pfs"; then
         cmd="$cmd -fsdev local,id=myid,path=$(pwd)/fs0,security_model=none -device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off"
     fi
 
+    if test "$root" -eq 1; then
+        cmd="sudo $cmd"
+    fi
     echo "Running command:"
     echo "$cmd"
     eval "$cmd"
@@ -71,19 +75,19 @@ prepare_fc_json()
     if test "$net" -eq 1; then
         prepare_fc_net
         boot_args="netdev.ipv4_addr=172.45.0.2 netdev.ipv4_gw_addr=172.45.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --"
-	network_interfaces='{"iface_id": "net1", "guest_mac":  "06:00:ac:10:00:02", "host_dev_name": "tap0"}'
+        network_interfaces='{"iface_id": "net1", "guest_mac":  "06:00:ac:10:00:02", "host_dev_name": "tap0"}'
     fi
     sed -i "s/__NETWORK_INTERFACES__/$network_interfaces/g" fc.json
     if test ! -z "$extra_boot_args"; then
-	boot_args="$boot_args $extra_boot_args"
+        boot_args="$boot_args $extra_boot_args"
     fi
     if test ! -z "$boot_args"; then
         sed -i "/kernel_image_path/s/$/,/" fc.json
         sed -i "/kernel_image_path/a     \"boot_args\": \"$boot_args\"" fc.json
-	if test "$fs" = "initrd"; then
+        if test "$fs" = "initrd"; then
             sed -i "/boot_args/s/$/,/" fc.json
             sed -i "/boot_args/a     \"initrd_path\": \"fs0.cpio\"" fc.json
-	fi
+        fi
     elif test "$fs" = "initrd"; then
         sed -i "/kernel_image_path/s/$/,/" fc.json
         sed -i "/kernel_image_path/a     \"initrd_path\": \"fs0.cpio\"" fc.json
@@ -94,7 +98,7 @@ run_fc()
 {
     prepare_fc_json
     if test "$fs" = "initrd"; then
-	prepare_initrd
+        prepare_initrd
     fi
 
     > /tmp/firecracker.log
@@ -106,6 +110,9 @@ run_fc()
     fi
     cmd="$cmd --api-sock /tmp/firecracker.socket --config-file fc.json"
 
+    if test "$root" -eq 1; then
+        cmd="sudo $cmd"
+    fi
     echo "Running command:"
     echo "$cmd"
     eval "$cmd"
@@ -157,9 +164,19 @@ fi
 
 if test -f "requires_net"; then
     net=1
+    root=1
 fi
 if test -f "requires_kvm"; then
     kvm=1
+    if test "$plat" = "qemu"; then
+        root=1
+    fi
+fi
+if test -f "uses_paging"; then
+    if test "$plat" = "qemu"; then
+        root=1
+        kvm=1
+    fi
 fi
 if test -f "extra_boot_args"; then
     extra_boot_args=$(cat "extra_boot_args")
