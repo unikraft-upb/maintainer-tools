@@ -113,6 +113,8 @@ test_python3()
     kill_vm "$1" "$3"
 }
 
+source test-list.sh
+
 build_logs_dir="$(pwd)/logs/builds"
 run_logs_dir="$(pwd)/logs/runs"
 
@@ -122,7 +124,7 @@ mkdir -p "${run_logs_dir}" > /dev/null 2>&1
 apps=()
 if test "$#" -ge 1; then
     for app in "$@"; do
-	    apps+=("apps/${app}")
+            apps+=("apps/${app}")
     done
 else
     apps=(apps/*/)
@@ -135,10 +137,32 @@ for a in "${apps[@]}"; do
     pushd "$a" > /dev/null 2>&1 || exit 1
 
     for build_script in ./clang-* ./gcc-*; do
+        skip=0
         printf "%-70s" "building with ${build_script}"
 
         build_log_file="${build_logs_dir}/$(basename "${a}")/$(basename "${build_script}" .sh)"
         run_log_file="${run_logs_dir}/$(basename "${a}")/$(basename "${build_script}" .sh)"
+
+        for regex in "${test_include_list[@]}"; do
+            echo "${build_script}" | grep -E "${regex}" &> /dev/null
+
+            if test "$?" -ne 0; then
+                    skip=1
+                    break
+            fi
+        done
+
+        for regex in "${test_exclude_list[@]}"; do
+            echo "${build_script}" | grep -E "${regex}" &> /dev/null
+
+            if test "$?" -eq 0; then
+                    skip=1
+                    break
+            fi
+        done
+
+        test "${skip}" -ne 0 && echo "SKIPPED" && continue
+
         eval "${build_script}" > "${build_log_file}" 2>&1 < /dev/null
 
         if test $? -ne 0; then
@@ -167,6 +191,27 @@ for a in "${apps[@]}"; do
 
         run_script="${run_script}.sh"
         printf "%-70s" "Running ${a} on ${plat} ${arch} ${fs}"
+
+        for regex in "${run_test_include_list[@]}"; do
+            echo "${build_script}" | grep -E "${regex}" &> /dev/null
+
+            if test "$?" -ne 0; then
+                    skip=1
+                    break
+            fi
+        done
+
+        for regex in "${run_test_exclude_list[@]}"; do
+            echo "${build_script}" | grep -E "${regex}" &> /dev/null
+
+            if test "$?" -eq 0; then
+                    skip=1
+                    break
+            fi
+        done
+
+        test "${skip}" -ne 0 && echo "SKIPPED" && continue
+
         app_base=$(echo "${a}" | cut -d"/" -f2)
         if test "$(type -t "test_${app_base}")" = "function"; then
             test_"${app_base}" "${run_script}" "${run_log_file}" "${app_base}"

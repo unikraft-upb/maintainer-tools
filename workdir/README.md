@@ -265,3 +265,13 @@ Beware that it takes a lot of time for the script to run, since there are a lot 
 
 In order for the script to be fully functional, config files need to be added for every application under `workdir/copy/base/apps/<app-name>/`.
 This is because, if no config file is present, the build scripts will open a menuconfig screen and then wait for user input.
+
+You can choose to only test some applications by passing them as arguments to the testing script:
+
+```console
+./test-apps.sh lua helloworld
+```
+
+To only enable / disable a certain set of tests, you can modify the lists in the `test-list.sh`.
+`test_include_list` and `test_exclude_list` contain regular expressions of build tests that will be added or excluded from the system.
+`run_test_include_list` and `run_test_exclude_list` contain regular expressions for the running tests.
