@@ -4,12 +4,12 @@ kill_vm()
 {
     echo "$1" | grep "-qemu-" > /dev/null 2>&1
     if test $? -eq 0; then
-        sudo kill -KILL "$(pgrep -f "qemu-system.*$2")" > /dev/null 2>&1
+        sudo kill -KILL $(pgrep -f "qemu-system.*$2") > /dev/null 2>&1
     fi
 
     echo "$1" | grep "-fc-" > /dev/null 2>&1
     if test $? -eq 0; then
-        sudo kill -KILL "$(pgrep -f "firecracker.*$2")" > /dev/null 2>&1
+        sudo kill -KILL $(pgrep -f "firecracker.*$2") > /dev/null 2>&1
     fi
 }
 
