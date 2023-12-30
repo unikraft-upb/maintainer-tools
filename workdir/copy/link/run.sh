@@ -46,7 +46,7 @@ run_qemu()
     fi
     if test "$net" -eq 1; then
         prepare_qemu_net
-        cmd="$cmd -netdev bridge,id=en0,br=virbr0 -device virtio-net-pci,netdev=en0 -append \"netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- $extra_boot_args\""
+        cmd="$cmd -netdev bridge,id=en0,br=virbr0 -device virtio-net-pci,netdev=en0 -append \"netdev.ip=172.44.0.2/24:172.44.0.1 -- $extra_boot_args\""
     elif test ! -z "$extra_boot_args"; then
         cmd="$cmd -append \"-- $extra_boot_args\""
     fi
