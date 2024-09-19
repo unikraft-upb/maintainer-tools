@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if test ! -f "out/helloworld_fc-x86_64"; then
+    echo "No kernel file out/hellowold_fc-x86_64." 1>&2
+    echo "Did you run ./build.fc.x86_64 ?" 1>&2
+    exit 1
+fi
+
+# Remove previously created files.
+sudo rm -f /tmp/firecracker.log
+touch /tmp/firecracker.log
+sudo rm -f /tmp/firecracker.socket
+
+sudo firecracker-x86_64 \
+        --api-sock /tmp/firecracker.socket \
+        --config-file fc.x86_64.json
