@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if test ! -f "out/helloworld_qemu-x86_64"; then
+    echo "No kernel file out/helloworld_qemu-x86_64." 1>&2
+    echo "Did you run ./build.qemu.x86_64 ?" 1>&2
+    exit 1
+fi
+
+sudo qemu-system-x86_64 \
+    -nographic \
+    -m 8 \
+    -kernel out/helloworld_qemu-x86_64 \
+    -cpu max
